@@ -16,14 +16,10 @@ import datetime,socket,os
 from torch.utils.data import DataLoader
 
 
+from transformers import BertTokenizer, BertModel
 
 # Load pre-trained model tokenizer (vocabulary)
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-
-
-
-
-
 
 t_total=800
 

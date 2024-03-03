@@ -1,17 +1,11 @@
 import torch
 import pickle
 import numpy as np
-from pytorch_pretrained_bert import BertTokenizer, BertModel, BertForSequenceClassification, BertForMaskedLM
-from pytorch_pretrained_bert.optimization import BertAdam
-import torch.nn as nn
-import torch.nn.functional as F 
-import torch.optim as optim
+from transformers import BertTokenizer
 from keras.preprocessing import sequence
-from torch.autograd import Variable
-import argparse
+import nltk
 
 from tensorboardX import SummaryWriter
-import datetime,socket,os
 
 def mask_pos(pair, pos):
 	tmp=pair[0]
@@ -27,23 +21,22 @@ def load_masked_data(deceptive, truthful, padded=True,traintest_ratio=.8, trunca
 		trutext=pickle.load(f)
 	tokenizer=BertTokenizer.from_pretrained('bert-base-uncased')
 
-	
-	
-
-	dec=[]
+	dec=[] # tokenize of each deceptive review
 	tru=[]
 	
 	decmask=[]
 	trumask=[]
 
-	
 	maxes=[]
+
 	for para in dectext:
+		# look through each review in deceptive file
 
 		tmp=tokenizer.tokenize(para)[:max_length]
 		dec.append(tmp)
 		maxes.append(len(tmp))
 		decmask.append(np.ones(len(tmp)))
+	
 	for para in trutext:
 		tmp=tokenizer.tokenize(para)[:max_length]
 		tru.append(tmp)
@@ -58,7 +51,6 @@ def load_masked_data(deceptive, truthful, padded=True,traintest_ratio=.8, trunca
 
 
 	if masked_pos!=None:
-		import nltk
 		for para in dec:
 			decpos.append(nltk.pos_tag(para))
 		for para in tru:
@@ -81,8 +73,6 @@ def load_masked_data(deceptive, truthful, padded=True,traintest_ratio=.8, trunca
 
 	decmask=sequence.pad_sequences(decmask,maxlen, padding='post', truncating='post')
 	trumask=sequence.pad_sequences(trumask,maxlen, padding='post', truncating='post')
-
-	
 
 	lendec=len(dec)
 	lentru=len(tru)
